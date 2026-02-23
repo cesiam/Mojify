@@ -5,9 +5,11 @@ import { FeedFilters } from "@/components/Navbar";
 import HeroSection from "@/components/HeroSection";
 import EmojiMatchFeed from "@/components/EmojiMatchFeed";
 import Leaderboard from "@/components/Leaderboard";
+import EmojiChat from "@/components/EmojiChat";
 
 const Index = () => {
   const [loading, setLoading] = useState(true);
+  const [sort, setSort] = useState("new");
 
   const handleLoadComplete = useCallback(() => {
     setLoading(false);
@@ -22,17 +24,20 @@ const Index = () => {
       <Navbar />
       <HeroSection />
 
-      <main className="mx-auto max-w-6xl px-4 pb-16">
+      <main id="feed" className="mx-auto max-w-6xl px-4 pb-16">
         <div className="grid grid-cols-1 lg:grid-cols-[1fr_300px] gap-6">
           {/* Feed */}
           <div>
-            <FeedFilters />
-            <EmojiMatchFeed />
+            <FeedFilters onSortChange={setSort} />
+            <EmojiMatchFeed sort={sort} />
           </div>
 
           {/* Sidebar */}
           <aside className="space-y-4">
             <Leaderboard />
+
+            {/* Emoji Chat */}
+            <EmojiChat />
 
             {/* Telegram CTA */}
             <div className="glass-card p-5 text-center">

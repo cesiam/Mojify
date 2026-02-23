@@ -65,20 +65,25 @@ const Navbar = () => {
   );
 };
 
-export const FeedFilters = () => {
-  const [filter, setFilter] = useState("hot");
+export const FeedFilters = ({ onSortChange }: { onSortChange?: (sort: string) => void }) => {
+  const [filter, setFilter] = useState("new");
   const filters = [
+    { id: "new", label: "New", icon: Clock },
     { id: "hot", label: "Hot", icon: Flame },
     { id: "trending", label: "Trending", icon: TrendingUp },
-    { id: "new", label: "New", icon: Clock },
   ];
+
+  const handleSelect = (id: string) => {
+    setFilter(id);
+    onSortChange?.(id);
+  };
 
   return (
     <div className="flex items-center gap-1 mb-4">
       {filters.map((f) => (
         <button
           key={f.id}
-          onClick={() => setFilter(f.id)}
+          onClick={() => handleSelect(f.id)}
           className={`inline-flex items-center gap-1.5 rounded-md px-3 py-1.5 text-xs font-medium transition-colors ${
             filter === f.id
               ? "bg-primary/15 text-primary"

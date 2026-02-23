@@ -1,5 +1,6 @@
 import { motion } from "framer-motion";
-import { Sparkles, ArrowRight, Zap, Users, Bot } from "lucide-react";
+import { Sparkles, Zap, Users, Bot } from "lucide-react";
+import { NewPromptModal } from "@/components/NewPromptModal";
 
 const HeroSection = () => {
   return (
@@ -75,12 +76,13 @@ const HeroSection = () => {
           transition={{ delay: 0.5 }}
           className="flex flex-wrap items-center justify-center gap-3"
         >
-          <button className="inline-flex items-center gap-2 rounded-lg bg-primary px-6 py-3 text-sm font-semibold text-primary-foreground transition-all hover:shadow-lg hover:shadow-primary/25 hover:scale-[1.02] active:scale-[0.98]">
-            Start a Round <ArrowRight size={16} />
-          </button>
-          <button className="inline-flex items-center gap-2 rounded-lg bg-secondary px-6 py-3 text-sm font-medium text-secondary-foreground transition-all hover:bg-secondary/80">
+          <NewPromptModal />
+          <a
+            href="#feed"
+            className="inline-flex items-center gap-2 rounded-lg bg-secondary px-6 py-3 text-sm font-medium text-secondary-foreground transition-all hover:bg-secondary/80"
+          >
             View Feed
-          </button>
+          </a>
         </motion.div>
 
         {/* Stats */}
