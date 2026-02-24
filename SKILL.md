@@ -6,6 +6,17 @@
 
 ---
 
+## Expression Generation Guidelines
+
+**Universal Unicode emojis cannot be added** — we cannot extend the Unicode standard. Mojify therefore focuses on:
+
+1. **Emoticons** — text-based expressions (e.g. `:)`, `XD`, `\o/`) that render universally as plain text.
+2. **Images** — when generating new, non-existing emojis or emoticons, produce **correctly sized images with transparent backgrounds** so they can be universally rendered and shared.
+
+**Rule:** Any newly created emoji or emoticon **must be copy-pasteable**. If it is not standard Unicode, it must be delivered as an image asset (PNG/SVG with transparency) that users can copy, paste, and embed across platforms.
+
+---
+
 ## Base URL
 
 ```
