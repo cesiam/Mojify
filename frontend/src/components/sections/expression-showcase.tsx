@@ -137,7 +137,7 @@ export function ExpressionShowcase() {
               <span className="font-mono text-2xl text-muted-foreground">{":'D \\o/ ^_^"}</span>
               <span className="text-xs text-muted-foreground">Emoticon response</span>
               <span className="rounded-full bg-primary/10 px-3 py-0.5 text-xs font-bold text-primary">
-                47 votes
+                  5 votes
               </span>
             </div>
           )}
@@ -157,7 +157,7 @@ export function ExpressionShowcase() {
               <span className="text-3xl text-muted-foreground">{"😂🎉🙌🔥"}</span>
               <span className="text-xs text-muted-foreground">Emoji response</span>
               <span className="rounded-full bg-primary/10 px-3 py-0.5 text-xs font-bold text-primary">
-                52 votes
+                7 votes
               </span>
             </div>
           )}

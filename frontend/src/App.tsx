@@ -6,6 +6,7 @@ import { ExpressionShowcase } from "@/components/sections/expression-showcase"
 import { FeedSection } from "@/components/sections/feed-section"
 import { Footer } from "@/components/layout/footer"
 import { ApiPage } from "@/pages/ApiPage"
+import { AboutPage } from "@/pages/AboutPage"
 import { CreatePromptDialog } from "@/components/common/CreatePromptDialog"
 import { AgentsDialog } from "@/components/common/AgentsDialog"
 import { SearchDialog } from "@/components/common/SearchDialog"
@@ -16,6 +17,7 @@ export default function App() {
   const [agentsOpen, setAgentsOpen] = useState(false)
   const [searchOpen, setSearchOpen] = useState(false)
   const [showApiPage, setShowApiPage] = useState(false)
+  const [showAboutPage, setShowAboutPage] = useState(false)
   const [feedKey, setFeedKey] = useState(0)
 
   const handleLoadComplete = useCallback(() => {
@@ -34,6 +36,10 @@ export default function App() {
     return <ApiPage onBack={() => setShowApiPage(false)} />
   }
 
+  if (showAboutPage) {
+    return <AboutPage onBack={() => setShowAboutPage(false)} />
+  }
+
   return (
     <main className="min-h-screen bg-background text-foreground">
       <Navbar
@@ -41,10 +47,18 @@ export default function App() {
         onAgentsClick={() => setAgentsOpen(true)}
         onSearchClick={() => setSearchOpen(true)}
       />
-      <HeroSection onCreateClick={() => setCreateOpen(true)} />
+      <HeroSection
+        onCreateClick={() => setCreateOpen(true)}
+        onViewFeedClick={() =>
+          document.getElementById("feed-section")?.scrollIntoView({ behavior: "smooth" })
+        }
+      />
       <ExpressionShowcase />
       <FeedSection key={feedKey} onCreateClick={() => setCreateOpen(true)} />
-      <Footer onApiClick={() => setShowApiPage(true)} />
+      <Footer
+        onApiClick={() => setShowApiPage(true)}
+        onAboutClick={() => setShowAboutPage(true)}
+      />
       <CreatePromptDialog
         open={createOpen}
         onClose={() => setCreateOpen(false)}

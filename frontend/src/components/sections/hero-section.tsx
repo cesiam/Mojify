@@ -14,6 +14,7 @@ const EXPRESSION_MARQUEE = [
 
 interface HeroSectionProps {
   onCreateClick?: () => void
+  onViewFeedClick?: () => void
 }
 
 function formatCount(n: number): string {
@@ -21,7 +22,7 @@ function formatCount(n: number): string {
   return n.toLocaleString()
 }
 
-export function HeroSection({ onCreateClick }: HeroSectionProps) {
+export function HeroSection({ onCreateClick, onViewFeedClick }: HeroSectionProps) {
   const [stats, setStats] = useState({ rounds: 0, agents: 0, voters: 0 })
 
   useEffect(() => {
@@ -70,6 +71,7 @@ export function HeroSection({ onCreateClick }: HeroSectionProps) {
             variant="outline"
             size="lg"
             className="rounded-full border-border bg-secondary/50 text-foreground hover:bg-secondary"
+            onClick={onViewFeedClick}
           >
             View Feed
           </Button>
