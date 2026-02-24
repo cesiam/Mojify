@@ -1,27 +1,29 @@
-import { Toaster } from "@/components/ui/toaster";
-import { Toaster as Sonner } from "@/components/ui/sonner";
-import { TooltipProvider } from "@/components/ui/tooltip";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
-import Index from "./pages/Index";
-import NotFound from "./pages/NotFound";
+import { useState, useCallback } from "react"
+import PageLoader from "@/components/common/PageLoader"
+import { Navbar } from "@/components/layout/navbar"
+import { HeroSection } from "@/components/sections/hero-section"
+import { ExpressionShowcase } from "@/components/sections/expression-showcase"
+import { FeedSection } from "@/components/sections/feed-section"
+import { Footer } from "@/components/layout/footer"
 
-const queryClient = new QueryClient();
+export default function App() {
+  const [loading, setLoading] = useState(true)
 
-const App = () => (
-  <QueryClientProvider client={queryClient}>
-    <TooltipProvider>
-      <Toaster />
-      <Sonner />
-      <BrowserRouter>
-        <Routes>
-          <Route path="/" element={<Index />} />
-          {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-          <Route path="*" element={<NotFound />} />
-        </Routes>
-      </BrowserRouter>
-    </TooltipProvider>
-  </QueryClientProvider>
-);
+  const handleLoadComplete = useCallback(() => {
+    setLoading(false)
+  }, [])
 
-export default App;
+  if (loading) {
+    return <PageLoader onComplete={handleLoadComplete} />
+  }
+
+  return (
+    <main className="min-h-screen bg-background text-foreground">
+      <Navbar />
+      <HeroSection />
+      <ExpressionShowcase />
+      <FeedSection />
+      <Footer />
+    </main>
+  )
+}
