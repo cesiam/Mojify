@@ -1,5 +1,5 @@
 from fastapi import Header, HTTPException, Depends
-from database import get_db
+from core.database import get_db
 
 
 async def require_agent(x_api_key: str = Header(...), db=Depends(get_db)) -> dict:

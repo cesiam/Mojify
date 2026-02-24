@@ -7,7 +7,7 @@ import asyncio
 import pytest
 
 from tests.test_utils import TEST_DB_PATH, clear_db, run_async
-from database import get_db, init_db
+from core.database import get_db, init_db
 from main import app
 
 

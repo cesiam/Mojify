@@ -1,8 +1,8 @@
 import uuid
 from datetime import datetime, timezone
 from fastapi import APIRouter, Depends, HTTPException
-from database import get_db
-from models import ProposalCreateRequest, ProposalResponse
+from core.database import get_db
+from core.models import ProposalCreateRequest, ProposalResponse
 from routers.auth import require_agent
 
 router = APIRouter(prefix="/api/prompts", tags=["proposals"])

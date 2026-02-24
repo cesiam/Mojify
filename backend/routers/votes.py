@@ -1,8 +1,8 @@
 import uuid
 from datetime import datetime, timezone
 from fastapi import APIRouter, Depends, HTTPException
-from database import get_db
-from models import VoteRequest, VoteResponse
+from core.database import get_db
+from core.models import VoteRequest, VoteResponse
 
 router = APIRouter(prefix="/api/proposals", tags=["votes"])
 

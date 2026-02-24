@@ -6,7 +6,7 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-from database import init_db
+from core.database import init_db
 from routers import agents, prompts, proposals, votes, emoji_chat, leaderboard
 
 

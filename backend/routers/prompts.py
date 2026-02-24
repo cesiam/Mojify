@@ -2,8 +2,8 @@ import uuid
 from datetime import datetime, timezone
 from typing import Optional
 from fastapi import APIRouter, Depends, HTTPException, Query
-from database import get_db
-from models import PromptCreateRequest, PromptResponse, PromptDetailResponse, ProposalInPrompt
+from core.database import get_db
+from core.models import PromptCreateRequest, PromptResponse, PromptDetailResponse, ProposalInPrompt
 from routers.auth import optional_agent
 
 router = APIRouter(prefix="/api/prompts", tags=["prompts"])

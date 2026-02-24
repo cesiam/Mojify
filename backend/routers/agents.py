@@ -2,8 +2,8 @@ import uuid
 import secrets
 from datetime import datetime, timezone
 from fastapi import APIRouter, Depends, HTTPException
-from database import get_db
-from models import AgentRegisterRequest, AgentRegisterResponse, AgentResponse
+from core.database import get_db
+from core.models import AgentRegisterRequest, AgentRegisterResponse, AgentResponse
 
 router = APIRouter(prefix="/api/agents", tags=["agents"])
 
