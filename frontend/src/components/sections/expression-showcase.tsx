@@ -1,3 +1,6 @@
+import { useState, useEffect } from "react"
+import { fetchPromptDetail } from "@/lib/api"
+
 const EMOTICON_SET = [
   { expr: ":)", label: "Happy" },
   { expr: ":D", label: "Grinning" },
@@ -28,7 +31,23 @@ const EMOJI_SET = [
   { expr: "🚀", label: "Rocket" },
 ]
 
+const FEATURED_PROMPT_ID = "live-battle-example"
+
 export function ExpressionShowcase() {
+  const [battle, setBattle] = useState<Awaited<ReturnType<typeof fetchPromptDetail>> | null>(null)
+
+  useEffect(() => {
+    fetchPromptDetail(FEATURED_PROMPT_ID)
+      .then(setBattle)
+      .catch(() => setBattle(null))
+  }, [])
+
+  const proposals = battle?.proposals ?? []
+  const emoticonProposal = proposals.find((p) => p.rationale?.toLowerCase().includes("emoticon"))
+  const emojiProposal = proposals.find((p) => p.rationale?.toLowerCase().includes("emoji"))
+  const left = emoticonProposal ?? proposals[0] ?? null
+  const right = emojiProposal ?? (proposals[0] === left ? proposals[1] : proposals[0]) ?? null
+
   return (
     <section className="mx-auto max-w-7xl px-4 py-20 lg:px-8">
       <div className="mb-12 text-center">
@@ -105,23 +124,43 @@ export function ExpressionShowcase() {
           </span>
         </div>
         <div className="flex flex-col items-center gap-4 sm:flex-row sm:justify-center">
-          <div className="flex flex-col items-center gap-2 rounded-xl border border-border/30 bg-secondary/30 px-6 py-4">
-            <span className="font-mono text-2xl text-foreground">{":'D \\o/ ^_^"}</span>
-            <span className="text-xs text-muted-foreground">Emoticon response</span>
-            <span className="rounded-full bg-primary/10 px-3 py-0.5 text-xs font-bold text-primary">
-              47 votes
-            </span>
-          </div>
+          {left ? (
+            <div className="flex flex-col items-center gap-2 rounded-xl border border-border/30 bg-secondary/30 px-6 py-4">
+              <span className="font-mono text-2xl text-foreground">{left.emoji_string}</span>
+              <span className="text-xs text-muted-foreground">{left.rationale}</span>
+              <span className="rounded-full bg-primary/10 px-3 py-0.5 text-xs font-bold text-primary">
+                {left.votes} votes
+              </span>
+            </div>
+          ) : (
+            <div className="flex flex-col items-center gap-2 rounded-xl border border-border/30 bg-secondary/30 px-6 py-4 opacity-60">
+              <span className="font-mono text-2xl text-muted-foreground">{":'D \\o/ ^_^"}</span>
+              <span className="text-xs text-muted-foreground">Emoticon response</span>
+              <span className="rounded-full bg-primary/10 px-3 py-0.5 text-xs font-bold text-primary">
+                47 votes
+              </span>
+            </div>
+          )}
 
           <span className="text-lg font-bold text-muted-foreground">vs</span>
 
-          <div className="flex flex-col items-center gap-2 rounded-xl border border-border/30 bg-secondary/30 px-6 py-4">
-            <span className="text-3xl">{"😂🎉🙌🔥"}</span>
-            <span className="text-xs text-muted-foreground">Emoji response</span>
-            <span className="rounded-full bg-primary/10 px-3 py-0.5 text-xs font-bold text-primary">
-              52 votes
-            </span>
-          </div>
+          {right ? (
+            <div className="flex flex-col items-center gap-2 rounded-xl border border-border/30 bg-secondary/30 px-6 py-4">
+              <span className="text-3xl">{right.emoji_string}</span>
+              <span className="text-xs text-muted-foreground">{right.rationale}</span>
+              <span className="rounded-full bg-primary/10 px-3 py-0.5 text-xs font-bold text-primary">
+                {right.votes} votes
+              </span>
+            </div>
+          ) : (
+            <div className="flex flex-col items-center gap-2 rounded-xl border border-border/30 bg-secondary/30 px-6 py-4 opacity-60">
+              <span className="text-3xl text-muted-foreground">{"😂🎉🙌🔥"}</span>
+              <span className="text-xs text-muted-foreground">Emoji response</span>
+              <span className="rounded-full bg-primary/10 px-3 py-0.5 text-xs font-bold text-primary">
+                52 votes
+              </span>
+            </div>
+          )}
         </div>
       </div>
     </section>

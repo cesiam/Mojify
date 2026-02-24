@@ -5,25 +5,64 @@ import { HeroSection } from "@/components/sections/hero-section"
 import { ExpressionShowcase } from "@/components/sections/expression-showcase"
 import { FeedSection } from "@/components/sections/feed-section"
 import { Footer } from "@/components/layout/footer"
+import { ApiPage } from "@/pages/ApiPage"
+import { CreatePromptDialog } from "@/components/common/CreatePromptDialog"
+import { AgentsDialog } from "@/components/common/AgentsDialog"
+import { SearchDialog } from "@/components/common/SearchDialog"
 
 export default function App() {
   const [loading, setLoading] = useState(true)
+  const [createOpen, setCreateOpen] = useState(false)
+  const [agentsOpen, setAgentsOpen] = useState(false)
+  const [searchOpen, setSearchOpen] = useState(false)
+  const [showApiPage, setShowApiPage] = useState(false)
+  const [feedKey, setFeedKey] = useState(0)
 
   const handleLoadComplete = useCallback(() => {
     setLoading(false)
+  }, [])
+
+  const handlePromptCreated = useCallback(() => {
+    setFeedKey((k) => k + 1)
   }, [])
 
   if (loading) {
     return <PageLoader onComplete={handleLoadComplete} />
   }
 
+  if (showApiPage) {
+    return <ApiPage onBack={() => setShowApiPage(false)} />
+  }
+
   return (
     <main className="min-h-screen bg-background text-foreground">
-      <Navbar />
-      <HeroSection />
+      <Navbar
+        onCreateClick={() => setCreateOpen(true)}
+        onAgentsClick={() => setAgentsOpen(true)}
+        onSearchClick={() => setSearchOpen(true)}
+      />
+      <HeroSection onCreateClick={() => setCreateOpen(true)} />
       <ExpressionShowcase />
-      <FeedSection />
-      <Footer />
+      <FeedSection key={feedKey} onCreateClick={() => setCreateOpen(true)} />
+      <Footer onApiClick={() => setShowApiPage(true)} />
+      <CreatePromptDialog
+        open={createOpen}
+        onClose={() => setCreateOpen(false)}
+        onCreated={handlePromptCreated}
+      />
+      <AgentsDialog open={agentsOpen} onClose={() => setAgentsOpen(false)} />
+      <SearchDialog
+        open={searchOpen}
+        onClose={() => setSearchOpen(false)}
+        onSelectPrompt={(id) => {
+          setSearchOpen(false)
+          document.getElementById("feed-section")?.scrollIntoView({ behavior: "smooth" })
+        }}
+        onSelectAgent={() => {
+          setSearchOpen(false)
+          setAgentsOpen(true)
+        }}
+      />
     </main>
   )
 }

@@ -1,7 +1,9 @@
+import { useState, useEffect } from "react"
 import { ArrowRight } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { FloatingExpressions } from "@/components/sections/floating-expressions"
+import { fetchStats } from "@/lib/api"
 
 const EXPRESSION_MARQUEE = [
   ":)", "😀", "XD", "😂", ";-)", "😍", "^_^", "🔥",
@@ -10,7 +12,24 @@ const EXPRESSION_MARQUEE = [
   "O_O", "🤖", "=D", "👾", ":-/", "💥",
 ]
 
-export function HeroSection() {
+interface HeroSectionProps {
+  onCreateClick?: () => void
+}
+
+function formatCount(n: number): string {
+  if (n >= 1000) return `${(n / 1000).toFixed(1)}K`
+  return n.toLocaleString()
+}
+
+export function HeroSection({ onCreateClick }: HeroSectionProps) {
+  const [stats, setStats] = useState({ rounds: 0, agents: 0, voters: 0 })
+
+  useEffect(() => {
+    fetchStats()
+      .then(setStats)
+      .catch(() => {})
+  }, [])
+
   return (
     <section className="relative flex min-h-[90vh] flex-col items-center justify-center overflow-hidden px-4 pt-16">
       <FloatingExpressions />
@@ -42,6 +61,7 @@ export function HeroSection() {
           <Button
             size="lg"
             className="rounded-full bg-primary px-8 text-primary-foreground hover:bg-primary/90"
+            onClick={onCreateClick}
           >
             Start a Round
             <ArrowRight className="ml-1 size-4" />
@@ -56,11 +76,11 @@ export function HeroSection() {
         </div>
 
         <div className="mt-4 flex items-center gap-8 sm:gap-12">
-          <StatItem value="2,847" label="Rounds" icon="⚡" />
+          <StatItem value={formatCount(stats.rounds)} label="Rounds" icon="⚡" />
           <div className="h-8 w-px bg-border" />
-          <StatItem value="12" label="Agents" icon="🤖" />
+          <StatItem value={formatCount(stats.agents)} label="Agents" icon="🤖" />
           <div className="h-8 w-px bg-border" />
-          <StatItem value="1.2K" label="Voters" icon="👥" />
+          <StatItem value={formatCount(stats.voters)} label="Voters" icon="👥" />
         </div>
       </div>
 

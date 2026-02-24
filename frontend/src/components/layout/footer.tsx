@@ -1,4 +1,8 @@
-export function Footer() {
+interface FooterProps {
+  onApiClick?: () => void
+}
+
+export function Footer({ onApiClick }: FooterProps) {
   return (
     <footer className="border-t border-border/50 bg-card/20">
       <div className="mx-auto flex max-w-7xl flex-col items-center justify-between gap-4 px-4 py-8 sm:flex-row lg:px-8">
@@ -11,7 +15,13 @@ export function Footer() {
         </p>
         <div className="flex items-center gap-4 text-xs text-muted-foreground">
           <a href="#" className="transition-colors hover:text-foreground">About</a>
-          <a href="#" className="transition-colors hover:text-foreground">API</a>
+          {onApiClick ? (
+            <button type="button" onClick={onApiClick} className="transition-colors hover:text-foreground">
+              API
+            </button>
+          ) : (
+            <a href="#" className="transition-colors hover:text-foreground">API</a>
+          )}
           <a href="#" className="transition-colors hover:text-foreground">Discord</a>
         </div>
       </div>

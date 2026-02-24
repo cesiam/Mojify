@@ -1,8 +1,14 @@
 import { useState } from "react"
-import { Search, Menu, X } from "lucide-react"
+import { Search, Menu, X, Plus } from "lucide-react"
 import { Button } from "@/components/ui/button"
 
-export function Navbar() {
+interface NavbarProps {
+  onCreateClick?: () => void
+  onAgentsClick?: () => void
+  onSearchClick?: () => void
+}
+
+export function Navbar({ onCreateClick, onAgentsClick, onSearchClick }: NavbarProps) {
   const [mobileOpen, setMobileOpen] = useState(false)
 
   return (
@@ -24,13 +30,34 @@ export function Navbar() {
           <Button variant="ghost" size="sm" className="text-foreground/80 hover:text-foreground">
             Leaderboard
           </Button>
-          <Button variant="ghost" size="sm" className="text-foreground/80 hover:text-foreground">
+          <Button
+            variant="ghost"
+            size="sm"
+            className="text-foreground/80 hover:text-foreground"
+            onClick={onAgentsClick}
+          >
             Agents
           </Button>
         </div>
 
         <div className="flex items-center gap-2">
-          <Button variant="ghost" size="icon-sm" className="text-muted-foreground hover:text-foreground">
+          {onCreateClick && (
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={onCreateClick}
+              className="hidden md:inline-flex"
+            >
+              <Plus className="size-4" />
+              Start Round
+            </Button>
+          )}
+          <Button
+            variant="ghost"
+            size="icon-sm"
+            className="text-muted-foreground hover:text-foreground"
+            onClick={onSearchClick}
+          >
             <Search className="size-4" />
             <span className="sr-only">Search</span>
           </Button>
@@ -54,13 +81,29 @@ export function Navbar() {
       {mobileOpen && (
         <div className="border-t border-border/50 bg-background/95 backdrop-blur-xl md:hidden">
           <div className="flex flex-col gap-1 px-4 py-3">
+            {onCreateClick && (
+              <Button variant="outline" className="justify-start" onClick={() => { onCreateClick(); setMobileOpen(false); }}>
+                <Plus className="size-4" />
+                Start Round
+              </Button>
+            )}
+            {onSearchClick && (
+              <Button variant="ghost" className="justify-start text-foreground/80" onClick={() => { onSearchClick(); setMobileOpen(false); }}>
+                <Search className="size-4" />
+                Search
+              </Button>
+            )}
             <Button variant="ghost" className="justify-start text-foreground/80">
               Feed
             </Button>
             <Button variant="ghost" className="justify-start text-foreground/80">
               Leaderboard
             </Button>
-            <Button variant="ghost" className="justify-start text-foreground/80">
+            <Button
+              variant="ghost"
+              className="justify-start text-foreground/80"
+              onClick={() => { onAgentsClick?.(); setMobileOpen(false); }}
+            >
               Agents
             </Button>
             <Button className="mt-2 rounded-full bg-primary text-primary-foreground">
