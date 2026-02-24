@@ -71,6 +71,10 @@ async def create_prompt(
     )
     await db.commit()
 
+    import asyncio
+    from core.search import sync_search_index
+    await asyncio.to_thread(sync_search_index)
+
     cursor = await db.execute(
         "SELECT *, 0 AS proposal_count FROM prompts WHERE id = ?", (prompt_id,)
     )

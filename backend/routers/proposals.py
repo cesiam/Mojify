@@ -36,6 +36,10 @@ async def submit_proposal(
     )
     await db.commit()
 
+    import asyncio
+    from core.search import sync_search_index
+    await asyncio.to_thread(sync_search_index)
+
     return ProposalResponse(
         id=proposal_id,
         prompt_id=prompt_id,

@@ -64,3 +64,88 @@ async def init_db():
     async with aiosqlite.connect(DB_PATH) as db:
         await db.executescript(CREATE_TABLES)
         await db.commit()
+
+    import asyncio
+    from core.search import init_search_tables, sync_search_index
+    init_search_tables()
+    await seed_live_battle_example()
+    await asyncio.to_thread(sync_search_index)
+
+
+async def seed_live_battle_example():
+    """Seed the Live Battle Example prompt if it doesn't exist."""
+    import uuid
+    from datetime import datetime, timezone
+
+    async with aiosqlite.connect(DB_PATH) as db:
+        cur = await db.execute(
+            "SELECT id FROM prompts WHERE id = ?", ("live-battle-example",)
+        )
+        if await cur.fetchone():
+            return  # Already seeded
+
+        now = datetime.now(timezone.utc).isoformat()
+
+        # Get or create agents for the example
+        agent_ids = {}
+        for name in ("EmoticonExample", "EmojiExample"):
+            cur = await db.execute(
+                "SELECT id FROM agents WHERE name = ?", (name,)
+            )
+            row = await cur.fetchone()
+            if row:
+                agent_ids[name] = row[0]
+            else:
+                aid = str(uuid.uuid4())
+                await db.execute(
+                    "INSERT INTO agents (id, name, api_key, created_at) VALUES (?, ?, ?, ?)",
+                    (aid, name, "seed-" + uuid.uuid4().hex, now),
+                )
+                agent_ids[name] = aid
+
+        # Create the featured prompt
+        await db.execute(
+            """INSERT INTO prompts (id, created_by, title, context_text, media_type, media_url, status, created_at)
+               VALUES (?, ?, ?, ?, 'text', NULL, 'closed', ?)""",
+            (
+                "live-battle-example",
+                None,
+                "Live Battle Example",
+                "Emoticon vs Emoji: classic text expressions face off against modern emojis.",
+                now,
+            ),
+        )
+
+        # Create two proposals
+        prop1_id = str(uuid.uuid4())
+        prop2_id = str(uuid.uuid4())
+        await db.execute(
+            """INSERT INTO proposals (id, prompt_id, agent_id, emoji_string, rationale, created_at)
+               VALUES (?, ?, ?, ?, ?, ?)""",
+            (prop1_id, "live-battle-example", agent_ids["EmoticonExample"], ":'D \\o/ ^_^", "Emoticon response", now),
+        )
+        await db.execute(
+            """INSERT INTO proposals (id, prompt_id, agent_id, emoji_string, rationale, created_at)
+               VALUES (?, ?, ?, ?, ?, ?)""",
+            (prop2_id, "live-battle-example", agent_ids["EmojiExample"], "😂🎉🙌🔥", "Emoji response", now),
+        )
+
+        # Add votes: 47 for proposal 1, 52 for proposal 2
+        for i in range(47):
+            vid = str(uuid.uuid4())
+            fp = f"seed_voter_p1_{i}"
+            await db.execute(
+                """INSERT INTO votes (id, proposal_id, user_fingerprint, value, created_at)
+                   VALUES (?, ?, ?, 1, ?)""",
+                (vid, prop1_id, fp, now),
+            )
+        for i in range(52):
+            vid = str(uuid.uuid4())
+            fp = f"seed_voter_p2_{i}"
+            await db.execute(
+                """INSERT INTO votes (id, proposal_id, user_fingerprint, value, created_at)
+                   VALUES (?, ?, ?, 1, ?)""",
+                (vid, prop2_id, fp, now),
+            )
+
+        await db.commit()

@@ -23,6 +23,10 @@ async def register_agent(body: AgentRegisterRequest, db=Depends(get_db)):
     except Exception:
         raise HTTPException(status_code=409, detail="Agent name already taken.")
 
+    import asyncio
+    from core.search import sync_search_index
+    await asyncio.to_thread(sync_search_index)
+
     return AgentRegisterResponse(
         id=agent_id,
         name=body.name.strip(),
