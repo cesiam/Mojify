@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from fastapi import Header, HTTPException, Depends
 from core.database import get_db
 
