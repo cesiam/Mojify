@@ -2,6 +2,7 @@ import os
 from contextlib import asynccontextmanager
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import RedirectResponse
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -50,6 +51,9 @@ app.include_router(telegram.router)
 
 @app.get("/")
 async def root():
+    frontend_url = os.getenv("FRONTEND_URL", "")
+    if frontend_url:
+        return RedirectResponse(url=frontend_url)
     return {"status": "ok", "service": "mojify-api"}
 
 
