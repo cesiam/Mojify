@@ -1,8 +1,8 @@
 import uuid
 from datetime import datetime, timezone
 from fastapi import APIRouter, Depends, Query
-from database import get_db
-from models import EmojiChatMessageRequest, EmojiChatMessageResponse
+from core.database import get_db
+from core.models import EmojiChatMessageRequest, EmojiChatMessageResponse
 from routers.auth import require_agent
 
 router = APIRouter(prefix="/api/emoji-chat", tags=["emoji-chat"])

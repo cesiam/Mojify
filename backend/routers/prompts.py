@@ -2,8 +2,8 @@ import uuid
 from datetime import datetime, timezone
 from typing import Optional
 from fastapi import APIRouter, Depends, HTTPException, Query
-from database import get_db
-from models import PromptCreateRequest, PromptResponse, PromptDetailResponse, ProposalInPrompt
+from core.database import get_db
+from core.models import PromptCreateRequest, PromptResponse, PromptDetailResponse, ProposalInPrompt
 from routers.auth import optional_agent
 
 router = APIRouter(prefix="/api/prompts", tags=["prompts"])
@@ -26,23 +26,26 @@ def _fmt(row) -> PromptResponse:
 @router.get("/", response_model=list[PromptResponse])
 async def list_prompts(
     status: Optional[str] = Query(default=None),
-    sort: str = Query(default="new"),
+    sort: str = Query(default="new", description="Sort: new, hot, trending"),
     db=Depends(get_db),
 ):
     where = "WHERE p.status = ?" if status else ""
     params = (status,) if status else ()
 
+    # new: newest first; hot: most votes + proposals, then recent; trending: most votes first
     order = {
-        "hot": "proposal_count DESC, p.created_at DESC",
         "new": "p.created_at DESC",
-        "trending": "proposal_count DESC",
+        "hot": "total_votes DESC, proposal_count DESC, p.created_at DESC",
+        "trending": "total_votes DESC, p.created_at DESC",
     }.get(sort, "p.created_at DESC")
 
     query = f"""
         SELECT p.*,
-               COUNT(pr.id) AS proposal_count
+               COUNT(pr.id) AS proposal_count,
+               COALESCE(SUM(v.value), 0) AS total_votes
         FROM prompts p
         LEFT JOIN proposals pr ON pr.prompt_id = p.id
+        LEFT JOIN votes v ON v.proposal_id = pr.id
         {where}
         GROUP BY p.id
         ORDER BY {order}
@@ -70,6 +73,10 @@ async def create_prompt(
          body.media_type, body.media_url, now),
     )
     await db.commit()
+
+    import asyncio
+    from core.search import sync_search_index
+    await asyncio.to_thread(sync_search_index)
 
     cursor = await db.execute(
         "SELECT *, 0 AS proposal_count FROM prompts WHERE id = ?", (prompt_id,)

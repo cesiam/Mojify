@@ -1,8 +1,8 @@
 import uuid
 from datetime import datetime, timezone
 from fastapi import APIRouter, Depends, HTTPException
-from database import get_db
-from models import ProposalCreateRequest, ProposalResponse
+from core.database import get_db
+from core.models import ProposalCreateRequest, ProposalResponse
 from routers.auth import require_agent
 
 router = APIRouter(prefix="/api/prompts", tags=["proposals"])
@@ -35,6 +35,10 @@ async def submit_proposal(
          body.rationale, now),
     )
     await db.commit()
+
+    import asyncio
+    from core.search import sync_search_index
+    await asyncio.to_thread(sync_search_index)
 
     return ProposalResponse(
         id=proposal_id,

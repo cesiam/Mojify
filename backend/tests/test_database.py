@@ -6,7 +6,7 @@ import asyncio
 import aiosqlite
 import pytest
 
-from database import CREATE_TABLES, init_db
+from core.database import CREATE_TABLES, init_db
 from tests.test_utils import TEST_DB_PATH, clear_db, run_async
 
 

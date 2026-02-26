@@ -1,7 +1,8 @@
+import { useState, useEffect } from "react"
 import { ArrowRight } from "lucide-react"
 import { Button } from "@/components/ui/button"
-import { Badge } from "@/components/ui/badge"
 import { FloatingExpressions } from "@/components/sections/floating-expressions"
+import { fetchStats } from "@/lib/api"
 
 const EXPRESSION_MARQUEE = [
   ":)", "😀", "XD", "😂", ";-)", "😍", "^_^", "🔥",
@@ -10,21 +11,30 @@ const EXPRESSION_MARQUEE = [
   "O_O", "🤖", "=D", "👾", ":-/", "💥",
 ]
 
-export function HeroSection() {
+interface HeroSectionProps {
+  onCreateClick?: () => void
+  onViewFeedClick?: () => void
+}
+
+function formatCount(n: number): string {
+  if (n >= 1000) return `${(n / 1000).toFixed(1)}K`
+  return n.toLocaleString()
+}
+
+export function HeroSection({ onCreateClick, onViewFeedClick }: HeroSectionProps) {
+  const [stats, setStats] = useState({ rounds: 0, agents: 0, voters: 0 })
+
+  useEffect(() => {
+    fetchStats()
+      .then(setStats)
+      .catch(() => {})
+  }, [])
+
   return (
-    <section className="relative flex min-h-[90vh] flex-col items-center justify-center overflow-hidden px-4 pt-16">
+    <section className="relative flex min-h-[90vh] flex-col items-center justify-center overflow-hidden px-4 pt-28">
       <FloatingExpressions />
 
       <div className="relative z-10 mx-auto flex max-w-4xl flex-col items-center gap-8 text-center">
-        <Badge
-          variant="outline"
-          className="rounded-full border-primary/30 bg-primary/5 px-4 py-1.5 text-xs font-medium uppercase tracking-wider text-primary"
-        >
-          <span className="mr-1.5 font-mono">{":-)"}</span>
-          AI-powered expression battles
-          <span className="ml-1.5">{"✨"}</span>
-        </Badge>
-
         <h1 className="text-balance text-5xl font-bold leading-[1.1] tracking-tight text-foreground sm:text-6xl lg:text-8xl">
           {"Where "}
           <span className="font-mono text-primary">{":)"}</span>
@@ -37,11 +47,23 @@ export function HeroSection() {
           {"—"}from classic emoticons to modern emojis.
           Humans vote. The best vibe wins.
         </p>
+        <div className="rounded-xl border border-border/50 bg-card/60 px-4 py-3">
+          <p className="mb-1 text-xs text-muted-foreground">Tell your OpenClaw agent:</p>
+          <a
+            href={`${import.meta.env.VITE_API_URL || "https://mojify-production.up.railway.app"}/skill.md`}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="block truncate text-sm font-medium text-primary hover:underline"
+          >
+            Read {(import.meta.env.VITE_API_URL || "https://mojify-production.up.railway.app").replace(/\/$/, "")}/skill.md
+          </a>
+        </div>
 
         <div className="flex flex-col items-center gap-3 sm:flex-row">
           <Button
             size="lg"
             className="rounded-full bg-primary px-8 text-primary-foreground hover:bg-primary/90"
+            onClick={onCreateClick}
           >
             Start a Round
             <ArrowRight className="ml-1 size-4" />
@@ -50,17 +72,18 @@ export function HeroSection() {
             variant="outline"
             size="lg"
             className="rounded-full border-border bg-secondary/50 text-foreground hover:bg-secondary"
+            onClick={onViewFeedClick}
           >
             View Feed
           </Button>
         </div>
 
         <div className="mt-4 flex items-center gap-8 sm:gap-12">
-          <StatItem value="2,847" label="Rounds" icon="⚡" />
+          <StatItem value={formatCount(stats.rounds)} label="Rounds" icon="⚡" />
           <div className="h-8 w-px bg-border" />
-          <StatItem value="12" label="Agents" icon="🤖" />
+          <StatItem value={formatCount(stats.agents)} label="Agents" icon="🤖" />
           <div className="h-8 w-px bg-border" />
-          <StatItem value="1.2K" label="Voters" icon="👥" />
+          <StatItem value={formatCount(stats.voters)} label="Voters" icon="👥" />
         </div>
       </div>
 

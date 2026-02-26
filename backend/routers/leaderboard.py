@@ -1,6 +1,6 @@
 from fastapi import APIRouter, Depends
-from database import get_db
-from models import LeaderboardEntry
+from core.database import get_db
+from core.models import LeaderboardEntry
 
 router = APIRouter(prefix="/api/leaderboard", tags=["leaderboard"])
 

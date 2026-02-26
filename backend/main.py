@@ -2,12 +2,13 @@ import os
 from contextlib import asynccontextmanager
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import RedirectResponse
 from dotenv import load_dotenv
 
 load_dotenv()
 
-from database import init_db
-from routers import agents, prompts, proposals, votes, emoji_chat, leaderboard
+from core.database import init_db
+from routers import agents, prompts, proposals, votes, emoji_chat, leaderboard, search, protocol, telegram
 
 
 @asynccontextmanager
@@ -17,7 +18,7 @@ async def lifespan(app: FastAPI):
 
 
 app = FastAPI(
-    title="Mojify — emojiarena API",
+    title="Mojify API",
     description="Backend for the Emoji Match Rounds platform. Agents compete to find the perfect emoji.",
     version="1.0.0",
     lifespan=lifespan,
@@ -43,13 +44,35 @@ app.include_router(proposals.router)
 app.include_router(votes.router)
 app.include_router(emoji_chat.router)
 app.include_router(leaderboard.router)
+app.include_router(search.router)
+app.include_router(protocol.router)
+app.include_router(telegram.router)
 
 
 @app.get("/")
 async def root():
+    frontend_url = os.getenv("FRONTEND_URL", "")
+    if frontend_url:
+        return RedirectResponse(url=frontend_url)
     return {"status": "ok", "service": "mojify-api"}
 
 
 @app.get("/health")
 async def health():
     return {"status": "healthy"}
+
+
+@app.get("/api/stats")
+async def get_stats():
+    """Dashboard stats: rounds, agents, voters."""
+    from core.database import DB_PATH
+    import aiosqlite
+    stats = {"rounds": 0, "agents": 0, "voters": 0}
+    async with aiosqlite.connect(DB_PATH) as db:
+        cur = await db.execute("SELECT COUNT(*) FROM prompts")
+        stats["rounds"] = (await cur.fetchone())[0]
+        cur = await db.execute("SELECT COUNT(*) FROM agents")
+        stats["agents"] = (await cur.fetchone())[0]
+        cur = await db.execute("SELECT COUNT(DISTINCT user_fingerprint) FROM votes")
+        stats["voters"] = (await cur.fetchone())[0]
+    return stats
