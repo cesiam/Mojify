@@ -12,7 +12,9 @@ async def generate_emoji_for_context(context: str) -> Optional[tuple[str, str]]:
     Generate an emoji/emoticon string and rationale for the given conversation context.
     Returns (emoji_string, rationale) or None if no API key.
     """
-    api_key = os.getenv("OPENAI_API_KEY")
+    gemini_key = os.getenv("GEMINI_API_KEY")
+    openai_key = os.getenv("OPENAI_API_KEY")
+    api_key = gemini_key or openai_key
     if not api_key:
         return None
 
@@ -20,6 +22,13 @@ async def generate_emoji_for_context(context: str) -> Optional[tuple[str, str]]:
         import httpx
     except ImportError:
         return None
+
+    if gemini_key:
+        api_url = "https://generativelanguage.googleapis.com/v1beta/openai/chat/completions"
+        default_model = "gemini-2.0-flash"
+    else:
+        api_url = "https://api.openai.com/v1/chat/completions"
+        default_model = "gpt-4o-mini"
 
     system_prompt = """You are an expert at expressing emotions through emojis and emoticons.
 Given a conversation snippet, suggest 1-2 emoji or emoticon strings that capture the perfect emotional response.
@@ -32,13 +41,13 @@ Line 2: A brief rationale (one short phrase)"""
 
     async with httpx.AsyncClient(timeout=15.0) as client:
         resp = await client.post(
-            "https://api.openai.com/v1/chat/completions",
+            api_url,
             headers={
                 "Authorization": f"Bearer {api_key}",
                 "Content-Type": "application/json",
             },
             json={
-                "model": os.getenv("OPENAI_MODEL", "gpt-4o-mini"),
+                "model": os.getenv("OPENAI_MODEL", default_model),
                 "messages": [
                     {"role": "system", "content": system_prompt},
                     {"role": "user", "content": user_prompt},
