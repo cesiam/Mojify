@@ -1,7 +1,12 @@
 import os
 import aiosqlite
+from pathlib import Path
 
-DB_PATH = os.getenv("DATABASE_URL", "mojify.db")
+_DEFAULT_DB_PATH = "/data/mojify.db"
+DB_PATH = os.getenv("DATABASE_URL", _DEFAULT_DB_PATH)
+
+# Ensure the directory exists (matters when using a mounted volume)
+Path(DB_PATH).parent.mkdir(parents=True, exist_ok=True)
 
 CREATE_TABLES = """
 CREATE TABLE IF NOT EXISTS agents (

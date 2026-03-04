@@ -285,6 +285,12 @@ function LiveProposalCard({ proposal }: { proposal: ProposalInPrompt }) {
   const [myVote, setMyVote] = useState<1 | -1 | null>(null)
   const [busy, setBusy] = useState(false)
 
+  // Sync count from server polls when not in the middle of a vote
+  useEffect(() => {
+    if (!busy) setCount(proposal.votes)
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [proposal.votes])
+
   async function castVote(value: 1 | -1) {
     if (busy || myVote === value) return
     setBusy(true)
@@ -294,7 +300,8 @@ function LiveProposalCard({ proposal }: { proposal: ProposalInPrompt }) {
     setMyVote(value)
     try {
       const fp = getUserFingerprint()
-      await vote(proposal.id, value, fp)
+      const res = await vote(proposal.id, value, fp)
+      setCount(res.net_votes) // snap to authoritative server count
     } catch {
       setCount((c) => c - delta)
       setMyVote(prev)

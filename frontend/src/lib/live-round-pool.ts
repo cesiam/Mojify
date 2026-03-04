@@ -6,6 +6,74 @@ export interface ScenarioEntry {
 export const SCENARIO_POOL: ScenarioEntry[] = [
   // Nameless emotions
   {
+    title: "eccliphoria",
+    context: "A conflicting blend of profound enjoyment and a lingering sense of emptiness—relishing a time of carefree living and boundless happiness while knowing that others are toiling diligently. Having everything seemingly in place—job, internships, supportive friends—yet feeling an inexplicable void, reminiscent of the duality explored in Ecclesiastes.",
+  },
+  {
+    title: "famaze",
+    context: "The feeling of encountering something you once found utterly captivating, only to later comprehend its underlying principle, and then encounter it anew. Like witnessing a magic trick, having its secrets revealed, and watching it again—still feeling amazed, but now with an inexplicable 'Ah' layered beneath the thrill.",
+  },
+  {
+    title: "Jeong",
+    context: "A feeling of joy that comes from sensing the interconnectedness of humanity. Unlike mere attachment between two close people, Jeong encompasses deep affection felt between humans as a whole—a profound sense of warmth, intimacy, and loyalty that extends beyond intensely close relationships.",
+  },
+  {
+    title: "millis",
+    context: "The sudden moment of tension as two people awkwardly glance at each other, both realizing at the same instant that only one piece of pizza is left.",
+  },
+  {
+    title: "inkpy",
+    context: "Thoughts that are like droplets of ink in water, permeating your mind and refusing to leave.",
+  },
+  {
+    title: "e-uff",
+    context: "The internal struggle between humility and the strong desire to boast.",
+  },
+  {
+    title: "han",
+    context: "A complex and deeply ingrained emotion in Korean culture, often described as a feeling of unresolved resentment, sorrow, or bitterness. It can arise from historical or personal experiences of suffering, loss, or injustice and is deeply intertwined with Korean identity and collective memory.",
+  },
+  {
+    title: "tarab",
+    context: "An Arabic word describing the emotional state induced by music—particularly the intense feelings of joy, ecstasy, or spiritual elevation that music can evoke.",
+  },
+  {
+    title: "hiraeth",
+    context: "A Welsh word conveying a deep longing for home—a homesickness tinged with grief or nostalgia for a place or time that may no longer exist.",
+  },
+  {
+    title: "sha-ri-ri",
+    context: "That tingly, heart-thumping emotion you feel as you open a letter from a loved one.",
+  },
+  {
+    title: "shinrin-yoku",
+    context: "A Japanese word translating to 'forest bathing'—the feeling of peace and rejuvenation experienced when immersing oneself in nature, particularly in a forest setting.",
+  },
+  {
+    title: "noonchi",
+    context: "The ability to sense and navigate social dynamics, emotions, and unspoken cues in interpersonal interactions. It involves sensitivity to others' feelings, intentions, and social context, and the skill of adapting one's behavior accordingly to maintain harmony.",
+  },
+  {
+    title: "sehnsucht",
+    context: "A German word for an intense longing or yearning for something unattainable or transcendent—a feeling of incompleteness or longing for a distant, often idealized, reality. Similar to saudade.",
+  },
+  {
+    title: "apocaly",
+    context: "The gripping fear of uncertainty about oneself, washed over while grappling with the unreliable nature of time. Committing to a routine and diligently marking each day—only to glance back and find a month has passed feeling like mere weeks. Nearing the end of a chapter and being startled to realize years have quietly slipped away.",
+  },
+  {
+    title: "mono-no-aware",
+    context: "A Japanese word describing the bittersweet awareness of the impermanence of things and the gentle sadness or wistfulness that accompanies it. Often associated with the beauty found in transient moments.",
+  },
+  {
+    title: "bystandstill",
+    context: "The storm of emotions—powerlessness, anger, sorrow, curiosity, and above all fear—that swirls within you as you witness injustice unfolding right before you, yet stand frozen, unable to intervene. The particular ache of watching the world then move on completely oblivious, as though nothing happened at all.",
+  },
+  {
+    title: "frailecho",
+    context: "The unsettling blend of pity and existential discomfort stirred by witnessing a small creature struggle desperately against its end—and realizing its helpless battle echoes your own silent battles. The moment something tiny becomes a poignant symbol of shared fragility, mortality, and isolation.",
+  },
+  {
     title: "saudade",
     context: "A complex emotional state in Portuguese associated with longing, melancholy, and nostalgia. It's often described as a deep emotional state that encompasses both joy and sadness, a longing for something or someone absent.",
   },
