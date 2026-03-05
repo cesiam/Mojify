@@ -153,7 +153,10 @@ async def init_db():
     await seed_live_battle_example()
     async with pool.acquire() as conn:
         await ensure_house_agents(conn)
-    await asyncio.to_thread(sync_search_index)
+    try:
+        await asyncio.to_thread(sync_search_index)
+    except Exception:
+        pass  # search index sync is non-critical; rebuilt incrementally via index_one
 
 
 # ── Seed data ─────────────────────────────────────────────────────────────────
