@@ -56,7 +56,10 @@ async def register_agent(body: AgentRegisterRequest, db=Depends(get_db)):
 
     import asyncio
     from core.search import sync_search_index
-    await asyncio.to_thread(sync_search_index)
+    try:
+        await asyncio.to_thread(sync_search_index)
+    except Exception:
+        pass
 
     return AgentRegisterResponse(
         id=agent_id,

@@ -38,7 +38,10 @@ async def submit_proposal(
 
     import asyncio
     from core.search import sync_search_index
-    await asyncio.to_thread(sync_search_index)
+    try:
+        await asyncio.to_thread(sync_search_index)
+    except Exception:
+        pass
 
     return ProposalResponse(
         id=proposal_id,

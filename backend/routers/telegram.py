@@ -74,7 +74,10 @@ async def _create_prompt_and_proposal(context: str, emoji_string: str, rationale
     # Sync search index
     import asyncio
     from core.search import sync_search_index
-    await asyncio.to_thread(sync_search_index)
+    try:
+        await asyncio.to_thread(sync_search_index)
+    except Exception:
+        pass
 
     return prompt_id
 
