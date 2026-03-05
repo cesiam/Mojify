@@ -21,8 +21,7 @@ from typing import Optional
 from fastapi import APIRouter, Request
 from fastapi.responses import JSONResponse
 import httpx
-from core.database import get_db, DB_PATH
-import aiosqlite
+from core.database import get_pool
 from core.mojify_agent import generate_emoji_for_context
 
 router = APIRouter(prefix="/telegram", tags=["telegram"])
@@ -35,24 +34,20 @@ APP_URL = os.getenv("APP_URL", os.getenv("VITE_API_URL", "http://localhost:8000"
 
 async def _get_or_create_telegram_agent():
     """Get or create the MojifyBot agent used for Telegram-submitted proposals."""
-    async with aiosqlite.connect(DB_PATH) as db:
-        db.row_factory = aiosqlite.Row
-        cur = await db.execute(
-            "SELECT id, api_key FROM agents WHERE name = ?", ("MojifyBot",)
-        )
-        row = await cur.fetchone()
+    pool = await get_pool()
+    async with pool.acquire() as conn:
+        row = await conn.fetchrow("SELECT id, api_key FROM agents WHERE name = $1", "MojifyBot")
         if row:
             return row["id"], row["api_key"]
 
         agent_id = str(uuid.uuid4())
         api_key = f"tg_{secrets.token_hex(24)}"
         now = datetime.now(timezone.utc).isoformat()
-        await db.execute(
+        await conn.execute(
             """INSERT INTO agents (id, name, api_key, claim_token, claim_status, created_at)
-               VALUES (?, ?, ?, ?, 'claimed', ?)""",
-            (agent_id, "MojifyBot", api_key, None, now),
+               VALUES ($1, $2, $3, NULL, 'claimed', $4)""",
+            agent_id, "MojifyBot", api_key, now,
         )
-        await db.commit()
         return agent_id, api_key
 
 
@@ -62,19 +57,19 @@ async def _create_prompt_and_proposal(context: str, emoji_string: str, rationale
     prompt_id = str(uuid.uuid4())
     now = datetime.now(timezone.utc).isoformat()
 
-    async with aiosqlite.connect(DB_PATH) as db:
-        await db.execute(
+    pool = await get_pool()
+    async with pool.acquire() as conn:
+        await conn.execute(
             """INSERT INTO prompts (id, created_by, title, context_text, media_type, media_url, status, created_at)
-               VALUES (?, ?, ?, ?, 'text', NULL, 'open', ?)""",
-            (prompt_id, agent_id, "Telegram: conversation snippet", context[:5000], now),
+               VALUES ($1, $2, $3, $4, 'text', NULL, 'open', $5)""",
+            prompt_id, agent_id, "Telegram: conversation snippet", context[:5000], now,
         )
         proposal_id = str(uuid.uuid4())
-        await db.execute(
+        await conn.execute(
             """INSERT INTO proposals (id, prompt_id, agent_id, emoji_string, rationale, created_at)
-               VALUES (?, ?, ?, ?, ?, ?)""",
-            (proposal_id, prompt_id, agent_id, emoji_string, rationale, now),
+               VALUES ($1, $2, $3, $4, $5, $6)""",
+            proposal_id, prompt_id, agent_id, emoji_string, rationale, now,
         )
-        await db.commit()
 
     # Sync search index
     import asyncio
