@@ -78,7 +78,9 @@ async def create_prompt(
 
     import asyncio
     from core.search import sync_search_index
+    from core.house_agents import submit_house_proposals
     await asyncio.to_thread(sync_search_index)
+    asyncio.create_task(submit_house_proposals(prompt_id, body.context_text, body.title))
 
     cursor = await db.execute(
         "SELECT *, 0 AS proposal_count FROM prompts WHERE id = ?", (prompt_id,)

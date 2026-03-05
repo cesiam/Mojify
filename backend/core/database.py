@@ -148,8 +148,11 @@ async def init_db():
 
     import asyncio
     from core.search import init_search_tables, sync_search_index
+    from core.house_agents import ensure_house_agents
     init_search_tables()
     await seed_live_battle_example()
+    async with pool.acquire() as conn:
+        await ensure_house_agents(conn)
     await asyncio.to_thread(sync_search_index)
 
 
