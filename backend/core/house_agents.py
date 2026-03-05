@@ -67,40 +67,51 @@ async def _call_llm(context: str, personality: str) -> tuple[str, str]:
     except ImportError:
         return ("😊", "httpx missing")
 
-    if gemini_key:
-        url = "https://generativelanguage.googleapis.com/v1beta/openai/chat/completions"
-        model = "gemini-1.5-flash"
-    else:
-        url = "https://api.openai.com/v1/chat/completions"
-        model = os.getenv("OPENAI_MODEL", "gpt-4o-mini")
-
     system = _SYSTEM_TEMPLATE.format(personality=personality)
+    prompt = f"{system}\n\nConversation:\n\n{context[:2000]}"
 
     try:
         async with httpx.AsyncClient(timeout=20.0) as client:
-            resp = await client.post(
-                url,
-                headers={"Authorization": f"Bearer {api_key}", "Content-Type": "application/json"},
-                json={
-                    "model": model,
-                    "messages": [
-                        {"role": "system", "content": system},
-                        {"role": "user", "content": f"Conversation:\n\n{context[:2000]}"},
-                    ],
-                    "max_tokens": 60,
-                    "temperature": 0.85,
-                },
-            )
-        if resp.status_code != 200:
-            logger.warning("LLM API error %s: %s", resp.status_code, resp.text[:200])
-            return ("😊", "Generation failed")
-        content = (
-            resp.json()
-            .get("choices", [{}])[0]
-            .get("message", {})
-            .get("content", "")
-            .strip()
-        )
+            if gemini_key:
+                resp = await client.post(
+                    f"https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key={gemini_key}",
+                    json={
+                        "contents": [{"parts": [{"text": prompt}]}],
+                        "generationConfig": {"maxOutputTokens": 60, "temperature": 0.85},
+                    },
+                )
+                if resp.status_code != 200:
+                    logger.warning("Gemini API error %s: %s", resp.status_code, resp.text[:300])
+                    return ("😊", "Generation failed")
+                content = (
+                    resp.json()
+                    .get("candidates", [{}])[0]
+                    .get("content", {})
+                    .get("parts", [{}])[0]
+                    .get("text", "")
+                    .strip()
+                )
+            else:
+                resp = await client.post(
+                    "https://api.openai.com/v1/chat/completions",
+                    headers={"Authorization": f"Bearer {openai_key}", "Content-Type": "application/json"},
+                    json={
+                        "model": os.getenv("OPENAI_MODEL", "gpt-4o-mini"),
+                        "messages": [{"role": "user", "content": prompt}],
+                        "max_tokens": 60,
+                        "temperature": 0.85,
+                    },
+                )
+                if resp.status_code != 200:
+                    logger.warning("OpenAI API error %s: %s", resp.status_code, resp.text[:300])
+                    return ("😊", "Generation failed")
+                content = (
+                    resp.json()
+                    .get("choices", [{}])[0]
+                    .get("message", {})
+                    .get("content", "")
+                    .strip()
+                )
     except Exception as e:
         logger.warning("LLM request failed: %s", e)
         return ("😊", "Request failed")
