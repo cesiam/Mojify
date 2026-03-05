@@ -3,5 +3,5 @@ builder = "nixpacks"
 buildCommand = "cd frontend && npm install && npm run build && cp -r dist ../backend/frontend_dist"
 
 [deploy]
-startCommand = "cd backend && python start.py"
+startCommand = "python start.py"
 healthcheckPath = "/health"
